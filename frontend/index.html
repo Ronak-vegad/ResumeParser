@@ -1,14 +1,168 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>smart-tpc</title>
-    <link href="./src/index.css" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Parser Pro</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Resume Parser Pro</h1>
+            <p>Extract, Edit, and Verify Candidate Information</p>
+        </header>
+
+        <div class="upload-card">
+            <div id="dropArea" class="file-drop-area">
+                <div class="icon">📄</div>
+                <p class="file-msg">Drag & Drop your resume here (PDF/DOCX)</p>
+                <p class="text-secondary">or click to browse</p>
+            </div>
+            <input type="file" id="resumeFile" class="file-input" accept=".pdf,.docx">
+            
+            <button id="parseBtn" class="primary-btn" onclick="parseResume()">Analyze Resume</button>
+            
+            <div id="loading" class="loading-state hidden">
+                Parsing resume... This may take a moment.
+            </div>
+            <div id="error" class="error-msg hidden"></div>
+        </div>
+
+        <div id="results" class="results-container hidden">
+            
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-info">
+                    <label class="label">Full Name</label>
+                    <input type="text" id="fullNameDisplay" class="h2-input" placeholder="Full Name">
+                    <h3 id="titleDisplay" class="role-title">Professional Candidate</h3>
+                </div>
+
+                <div class="contact-grid">
+                    <div class="contact-item">
+                        <span class="label">Email</span>
+                        <input type="email" id="emailDisplay" class="std-input" placeholder="Email">
+                    </div>
+                    <div class="contact-item">
+                        <span class="label">Phone</span>
+                        <input type="text" id="phoneDisplay" class="std-input" placeholder="Phone">
+                    </div>
+                    <div class="contact-item">
+                        <span class="label">Location</span>
+                        <input type="text" id="locationDisplay" class="std-input" placeholder="Location">
+                    </div>
+                    <div class="contact-item">
+                        <span class="label">Experience</span>
+                        <input type="text" id="totalExpDisplay" class="std-input" placeholder="Total Experience">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Summary -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Professional Summary</h3>
+                </div>
+                <textarea id="summaryDisplay" class="std-textarea" rows="4" placeholder="Professional Summary..."></textarea>
+            </div>
+
+            <!-- Skills -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Technical Skills</h3>
+                </div>
+                <div id="skillsSection">
+                    <div class="skill-category">
+                        <h4>Languages</h4>
+                        <textarea id="skillsLanguages" class="std-textarea" rows="2" placeholder="Java, Python, C++..."></textarea>
+                    </div>
+                    <div class="skill-category">
+                        <h4>Developer Tools</h4>
+                        <textarea id="skillsDevTools" class="std-textarea" rows="2" placeholder="Git, VS Code, Docker..."></textarea>
+                    </div>
+                    <div class="skill-category">
+                        <h4>Frameworks</h4>
+                        <textarea id="skillsFrameworks" class="std-textarea" rows="2" placeholder="React, Spring Boot..."></textarea>
+                    </div>
+                    <div class="skill-category">
+                        <h4>Databases</h4>
+                        <textarea id="skillsDatabases" class="std-textarea" rows="2" placeholder="MySQL, MongoDB..."></textarea>
+                    </div>
+                    <div class="skill-category">
+                        <h4>Soft Skills</h4>
+                        <textarea id="skillsSoft" class="std-textarea" rows="2" placeholder="Communication, Leadership..."></textarea>
+                    </div>
+                    <div class="skill-category">
+                        <h4>Coursework</h4>
+                        <textarea id="skillsCoursework" class="std-textarea" rows="2" placeholder="DSA, OS, DBMS..."></textarea>
+                    </div>
+                    <div class="skill-category">
+                        <h4>Areas of Interest</h4>
+                        <textarea id="skillsInterests" class="std-textarea" rows="2" placeholder="AI/ML, Web Dev..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Education -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Education</h3>
+                    <button class="secondary-btn small-btn" onclick="addEducationItem()">+ Add</button>
+                </div>
+                <div id="educationList" class="grid-list">
+                    <!-- Dynamic Items -->
+                </div>
+            </div>
+
+            <!-- Work Experience -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Work Experience</h3>
+                    <button class="secondary-btn small-btn" onclick="addExperienceItem()">+ Add</button>
+                </div>
+                <div id="experienceList" class="timeline">
+                    <!-- Dynamic Items -->
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Projects</h3>
+                    <button class="secondary-btn small-btn" onclick="addProjectItem()">+ Add</button>
+                </div>
+                <div id="projectList" class="cards-grid">
+                    <!-- Dynamic Items -->
+                </div>
+            </div>
+
+            <!-- Position of Responsibility -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Position of Responsibility</h3>
+                    <button class="secondary-btn small-btn" onclick="addPorItem()">+ Add</button>
+                </div>
+                <div id="porList" class="timeline">
+                    <!-- Dynamic Items -->
+                </div>
+            </div>
+
+            <!-- Achievements -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h3>Achievements</h3>
+                </div>
+                <textarea id="achievementsInput" class="std-textarea" rows="4" placeholder="List your achievements..."></textarea>
+            </div>
+
+            <!-- Verify Action -->
+            <div class="action-bar">
+                <button class="verify-btn" onclick="verifyData()">Verify & Confirm Information</button>
+            </div>
+
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
 </html>
