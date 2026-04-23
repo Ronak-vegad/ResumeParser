@@ -7,3 +7,8 @@ pdfplumber
 python-docx
 python-dotenv
 pymupdf
+sqlalchemy
+passlib[bcrypt]
+bcrypt>=4.0.0
+pyjwt
+email-validator

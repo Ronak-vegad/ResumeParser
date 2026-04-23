@@ -1,9 +1,15 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from contextlib import asynccontextmanager
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import shutil
 import os
 import tempfile
+from database import engine, Base
+import models  # noqa: F401
+from auth_routes import router as auth_router
+from auth_utils import get_current_user
+from models import User
 from resume_parser import (
     extract_text_from_pdf,
     extract_text_from_docx,
@@ -11,19 +17,31 @@ from resume_parser import (
     empty_parsed_resume,
 )
 
-app = FastAPI(title="Resume Parser API")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
+
+
+app = FastAPI(title="Resume Parser API", lifespan=lifespan)
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for simplicity in this demo
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(auth_router)
+
+
 @app.post("/parse-resume")
-async def parse_resume(file: UploadFile = File(...)):
+async def parse_resume(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
     if not file:
         raise HTTPException(status_code=400, detail="No file uploaded")
     
